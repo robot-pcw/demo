@@ -1,4 +1,3 @@
-# embedding
-test word vector
-0. pretrain embedding
-1. text-classification
+# simple embedding test 
+0. pretrain embedding 
+1. text-classification task
