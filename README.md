@@ -1,1 +1,4 @@
-# notes, examples, demos
+* notes  
+* lab  
+* demos  
+* experiments
