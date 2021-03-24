@@ -5,7 +5,6 @@
 # @Description: <layer interface>
 
 import numpy as np
-from tensorflow.keras import Model
 
 """
 https://keras.io/api/layers/base_layer/

@@ -1,4 +1,0 @@
-* notes  
-* lab  
-* demos  
-* experiments
