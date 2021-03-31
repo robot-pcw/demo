@@ -8,21 +8,18 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-"""
-Text classification with Transformer
-https://keras.io/examples/nlp/text_classification_with_transformer/
-"""
 
-class TransformerBlock(layers.Layer):
-    """Transformer Encoder: self-attention + residual short-cut + layer normalization"""
+class TransformerTypeEncoder(layers.Layer):
+    """Transformer Encoder: self-attention (or attention-like) + residual short-cut + layer normalization"""
     def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):
-        super(TransformerBlock, self).__init__()
+        super(TransformerTypeEncoder, self).__init__()
         self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
         self.ffn = keras.Sequential(
             [layers.Dense(ff_dim, activation="relu"), layers.Dense(embed_dim),]
         )
         self.layer_norm1 = layers.LayerNormalization(epsilon=1e-6)
         self.layer_norm2 = layers.LayerNormalization(epsilon=1e-6)
+
         self.dropout1 = layers.Dropout(rate)
         self.dropout2 = layers.Dropout(rate)
 
@@ -33,6 +30,7 @@ class TransformerBlock(layers.Layer):
         ffn_output = self.ffn(out1)
         ffn_output = self.dropout2(ffn_output, training=training)
         return self.layer_norm2(out1 + ffn_output)
+
 
 class TokenAndPositionEmbedding(layers.Layer):
     def __init__(self, max_len, vocab_size, embed_dim):
