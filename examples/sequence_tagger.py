@@ -3,7 +3,7 @@
 # @Time    : 3/30/21 12:30 下午
 # @Author  : 4c1p
 # @Description: <>
-from typing import List, NoReturn
+from typing import List, NoReturn, Tuple
 import numpy as np
 
 class HMM:
@@ -44,29 +44,48 @@ class HMM:
         return np.sum(local_state_prob)
 
 
-    def predict(self, outputs: List[int]) -> List[int]:
+    def decode(self, outputs: List[int]) -> List[int]:
         """hidden state decode：找到最大可能的状态序列
         """
         return self._viterbi(outputs)
 
-    def _viterbi(self, outputs: List[int]) -> List[int]:
+    def _viterbi(self, outputs: List[int]) -> Tuple[List[int], float]:
         """使用DP的维特比解码
         """
-        pass
+        T = len(outputs)
+        state_path = [[-1]*self.states for _ in range(T)]   #record each step state prob
+        prob = self.pi * self.B[:,outputs[0]]
+        for t in range(1, T):
+            prob_ = np.ones_like(prob)
+            for i in range(self.states):
+                prob_ji = prob * self.A[:,i].T    # state j -> state i
+                prob_i, prefix_i = np.max(prob_ji) * self.B[i][outputs[t]], np.argmax(prob_ji)
+                prob_[i] = prob_i
+                state_path[t][i] = prefix_i
+            prob = prob_
+        decode_id = np.argmax(prob)
+        decode = []
+        step = T-1
+        while decode_id >= 0:
+            decode.append(decode_id)
+            decode_id = state_path[step][decode_id]
+            step -= 1
+        return decode, max(prob)
 
 
-
-def test_forward_prob():
+def test_hmm():
     A = np.array([[0.5, 0.2, 0.3],[0.3, 0.5, 0.2],[0.2, 0.3, 0.5]])
     B = np.array([[0.5, 0.5], [0.4, 0.6], [0.7, 0.3]])
     p0 = np.array([0.2, 0.4, 0.4])
     hmm = HMM(3, 2)
     hmm.load(A, B, p0)
-    print(hmm.observe_prob([0,1,0]))
+    obs = [0, 1, 0]
+    print("观测序列概率：", hmm.observe_prob(obs))
+    print("最优状态序列及概率: ", hmm.decode(obs))
 
 
 if __name__ == '__main__':
-    test_forward_prob()
+    test_hmm()
 
 
 
